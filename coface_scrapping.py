@@ -10,9 +10,13 @@ class CountryRisk:
         self.area = area
         self.risk = risk
         self.climate = climate
+    def __str__(self):
+        return "%s, %s, %s, %s" % (self.country, self.area, self.risk, self.climate)
 class CofaceScrapping:
     def __init__(self):
         print("Jestem w kontruktorze")
+        self.countryRisks = []
+        self.area = {0 : "Africa", 1 : "America", 2 : "Asia", 3 : "CIS", 4 : "Europe", 5 : "Middle-East"}
         pass
     def getTablesByPandas(self):
         # pobieramy tabele z html do listy coface
@@ -20,10 +24,13 @@ class CofaceScrapping:
                 'https://www.coface.com/Economic-Studies-and-Country-Risks/Comparative-table-of-country-assessments')
         for c in coface:
             print(c)
+
+    def printResults(self):
+        for i in self.countryRisks.index:
+            print(self.countryRisks['Country risk assessment'][i])
+
     def getHtmlCodeByBs4(self):
         pass
-
-
-
 cs = CofaceScrapping()      # utworzenie obiektu i wywołanie konstruktora domyślnego
 cs.getTablesByPandas()      # wywołanie metody
+cs.printResults()

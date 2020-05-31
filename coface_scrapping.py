@@ -5,6 +5,7 @@ import html5lib
 # 1. Skrapowanie strony: https://www.coface.com/Economic-Studies-and-Country-Risks/Comparative-table-of-country-assessments
 # 2. Dwa podejścia bs4 i pd
 import requests
+import xlsxwriter
 
 
 class CountryRisk:
@@ -15,7 +16,7 @@ class CountryRisk:
         self.risk = risk
         self.climate = climate
     def __str__(self):
-        return "%s, %s, %s, %s, %s" % (self.country, self.ref, self.area, self.risk, self.climate)
+        return "%s; %s; %s; %s; %s" % (self.country, self.ref, self.area, self.risk, self.climate)
 class CofaceScrapping:
     def __init__(self):
         self.countryRisks = []
@@ -64,7 +65,27 @@ class ExportController(CofaceScrapping):
     def exportToDatabase(self):
         pass
     def exportToXlsx(self):
-        pass
+        tableTitle = [
+            "COUNTRY",
+            "REFERENCE LINK",
+            "GEOGRAPHICAL AREA",
+            "COUNTRY RISK ASSESSMENT",
+            "BUSINESS CLIMATE ASSESSMENT"]
+        workbook = xlsxwriter.Workbook('BusinessRisks.xlsx')    # utworzenie pliku excel
+        worksheet = workbook.add_worksheet()                    # utworzenie arkusz
+        row = 0
+        column = 0
+        while(column < len(tableTitle)):
+            worksheet.write(row, column, tableTitle[column])
+            column += 1
+        row = 1
+        while(row - 1 < len(self.countryRisks)):        # pętla iterująca po wierszach
+            column = 0
+            while(column < len(tableTitle)):    # pętla iterująca po kolumnach
+                worksheet.write(row, column, str(self.countryRisks[row - 1]).split("; ")[column])
+                column += 1
+            row += 1
+        workbook.close()
 
 cs = ExportController()      # utworzenie obiektu i wywołanie konstruktora domyślnego
 # cs.getTablesByPandas()      # wywołanie metody

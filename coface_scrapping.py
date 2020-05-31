@@ -117,34 +117,27 @@ class ExportController(CofaceScrapping):
         self.c.execute("SELECT country, geolocation, risk, climate FROM business_risk")
         businessRisk = self.c.fetchall()
         risk_df = pd.DataFrame(businessRisk, columns=['country','area','risk','climate'])
-        counties = risk_df['country'].tolist()
-        areas = risk_df['area'].tolist()
-        risks = risk_df['risk'].tolist()
-        climates = risk_df['climate'].tolist()
-
+        counties = risk_df['country'].tolist()[:5]
+        areas = risk_df['area'].tolist()[:5]
+        risks = risk_df['risk'].tolist()[:5]
+        climates = risk_df['climate'].tolist()[:5]
+        categories = {"A1" : 1, "A2" : 2, "A3" : 3, "A4" : 4, "B" : 5, "C" : 6, "D" : 7, "E" : 8}
         x = pd.np.arange(len(counties))  # the label locations
         width = 0.35  # the width of the bars
-
+        risks_cat = []
+        climates_cat = []
+        for v in risks:
+            risks_cat.append(categories[v])
+        for v in climates:
+            climates_cat.append(categories[v])
         fig, ax = plt.subplots()
-        rects1 = ax.bar(x - width / 2, risks, width, label='Business Risk Asesm.')
-        rects2 = ax.bar(x + width / 2, climates, width, label='Business Climate Asesm.')
-
+        rects1 = ax.bar(x - width / 2, risks_cat, width, label='Business Risk Asesm.')
+        rects2 = ax.bar(x + width / 2, climates_cat, width, label='Business Climate Asesm.')
         ax.set_ylabel('Categories')
         ax.set_title('Business risk & climate assesments')
         ax.set_xticks(x)
         ax.set_xticklabels(counties)
         ax.legend()
-        def autolabel(rects):
-            """Attach a text label above each bar in *rects*, displaying its height."""
-            for rect in rects:
-                height = rect.get_height()
-                ax.annotate('{}'.format(height),
-                            xy=(rect.get_x() + rect.get_width() / 2, height),
-                            xytext=(0, 3),  # 3 points vertical offset
-                            textcoords="offset points",
-                            ha='center', va='bottom')
-        autolabel(rects1)
-        autolabel(rects2)
         fig.tight_layout()
         plt.show()
 

@@ -15,7 +15,7 @@ class CountryRisk:
         self.risk = risk
         self.climate = climate
     def __str__(self):
-        return "%s, %s, %s, %s" % (self.country, self.area, self.risk, self.climate)
+        return "%s, %s, %s, %s, %s" % (self.country, self.ref, self.area, self.risk, self.climate)
 class CofaceScrapping:
     def __init__(self):
         print("Jestem w kontruktorze")
@@ -48,14 +48,23 @@ class CofaceScrapping:
                 .replace('<th class="new_eval">\n','')\
                 .replace(']','').split(', '))
             tableMarkerA = tables[i].findAll('a')
+            tableMarkerTd = tables[i].findAll('td',attrs={'class' : 'eval'})
+            tableTd = []
+            for index, value in enumerate(tableMarkerTd):
+                tableTd.append(str(tableMarkerTd[index])\
+                    .replace('<td class="eval">', '')\
+                    .replace('<span class="value">', '')\
+                    .replace('</span>', '')\
+                    .replace('</td>', '').strip())
+            risks = tableTd[::2]      # nieparzyste
+            climates = tableTd[1::2]  # parzyste
             for index, a in enumerate(tableMarkerA):
                 self.countryRisks.append(CountryRisk(
                     str(a).replace('</a>', '').split('">')[1],
                     str(a).replace('<a href="', '').split('">')[0],
                     headers[i][0],
-                    "X",
-                    "X"))
-            # print(tables[i].findAll('span'))
+                    risks[index],
+                    climates[index]))
         for cs in self.countryRisks:
             print(cs)
 

@@ -141,6 +141,16 @@ class ExportController(CofaceScrapping):
         fig.tight_layout()
         plt.show()
 
+    def generatePieChart(self):
+        self.c.execute("SELECT climate, 100*(count(*)/(SELECT count(*) FROM business_risk)) "
+                       "FROM business_risk GROUP BY climate ORDER climate")
+        result = self.c.fetchall()
+        agg_df = pd.DataFrame(result, columns=['climate', 'count'])
+        climates = agg_df['climate'].tolist()
+        contribution = agg_df['count'].tolist()
+
+        
+
 
 cs = ExportController()      # utworzenie obiektu i wywołanie konstruktora domyślnego
 # cs.getTablesByPandas()      # wywołanie metody

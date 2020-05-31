@@ -9,6 +9,8 @@ import html5lib
 import pymysql
 import requests
 import xlsxwriter
+import matplotlib
+import matplotlib.pyplot as plt
 
 
 class CountryRisk:
@@ -96,11 +98,11 @@ class ExportController(CofaceScrapping):
         workbook.close()
     def exportToDatabase(self):
         conn = pymysql.connect("localhost", "root", "miki123", "tm_db")
-        c = conn.cursor()
+        self.c = conn.cursor()
         conn.autocommit(True)
         # utworzenie tabelki SQL
-        c.execute("DROP TABLE business_risk");
-        c.execute("CREATE TABLE business_risk ("
+        self.c.execute("DROP TABLE business_risk");
+        self.c.execute("CREATE TABLE business_risk ("
                   "risk_id int primary key auto_increment, "
                   "country varchar(255), "
                   "reflink varchar(512), "
@@ -109,10 +111,42 @@ class ExportController(CofaceScrapping):
                   "climate varchar(5)"
                   ")")
         for row in self.countryRisks:
-            c.execute("INSERT INTO business_risk VALUES (default, %s,%s,%s,%s,%s)",
+            self.c.execute("INSERT INTO business_risk VALUES (default, %s,%s,%s,%s,%s)",
                       (row.country, row.ref, row.area, row.risk, row.climate))
-        conn.close()
-        # wprowadzenie danych do tabelki SQL
+    def generatePlots(self):
+        self.c.execute("SELECT country, geolocation, risk, climate FROM business_risk")
+        businessRisk = self.c.fetchall()
+        risk_df = pd.DataFrame(businessRisk, columns=['country','area','risk','climate'])
+        counties = risk_df['country'].tolist()
+        areas = risk_df['area'].tolist()
+        risks = risk_df['risk'].tolist()
+        climates = risk_df['climate'].tolist()
+
+        x = pd.np.arange(len(counties))  # the label locations
+        width = 0.35  # the width of the bars
+
+        fig, ax = plt.subplots()
+        rects1 = ax.bar(x - width / 2, risks, width, label='Business Risk Asesm.')
+        rects2 = ax.bar(x + width / 2, climates, width, label='Business Climate Asesm.')
+
+        ax.set_ylabel('Categories')
+        ax.set_title('Business risk & climate assesments')
+        ax.set_xticks(x)
+        ax.set_xticklabels(counties)
+        ax.legend()
+        def autolabel(rects):
+            """Attach a text label above each bar in *rects*, displaying its height."""
+            for rect in rects:
+                height = rect.get_height()
+                ax.annotate('{}'.format(height),
+                            xy=(rect.get_x() + rect.get_width() / 2, height),
+                            xytext=(0, 3),  # 3 points vertical offset
+                            textcoords="offset points",
+                            ha='center', va='bottom')
+        autolabel(rects1)
+        autolabel(rects2)
+        fig.tight_layout()
+        plt.show()
 
 
 cs = ExportController()      # utworzenie obiektu i wywołanie konstruktora domyślnego
@@ -121,3 +155,4 @@ cs.getHtmlCodeByBs4()
 cs.printResults()
 cs.exportToXlsx()
 cs.exportToDatabase()
+cs.generatePlots()

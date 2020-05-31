@@ -60,8 +60,14 @@ class CofaceScrapping:
         for cs in self.countryRisks:
             print(cs)
 
+class ExportController(CofaceScrapping):
+    def exportToDatabase(self):
+        pass
+    def exportToXlsx(self):
+        pass
 
-cs = CofaceScrapping()      # utworzenie obiektu i wywołanie konstruktora domyślnego
+cs = ExportController()      # utworzenie obiektu i wywołanie konstruktora domyślnego
 # cs.getTablesByPandas()      # wywołanie metody
 cs.getHtmlCodeByBs4()
 cs.printResults()
+cs.exportToXlsx()

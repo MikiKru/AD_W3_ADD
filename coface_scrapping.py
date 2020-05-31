@@ -25,12 +25,12 @@ class CofaceScrapping:
         for c in coface:
             print(c)
 
-    def printResults(self):
-        for i in self.countryRisks.index:
-            print(self.countryRisks['Country risk assessment'][i])
+    # def printResults(self):
+    #     for i in self.countryRisks.index:
+    #         print(self.countryRisks['Country risk assessment'][i])
 
     def getHtmlCodeByBs4(self):
         pass
 cs = CofaceScrapping()      # utworzenie obiektu i wywołanie konstruktora domyślnego
 cs.getTablesByPandas()      # wywołanie metody
-cs.printResults()
+# cs.printResults()

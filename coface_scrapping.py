@@ -142,14 +142,18 @@ class ExportController(CofaceScrapping):
         plt.show()
 
     def generatePieChart(self):
-        self.c.execute("SELECT climate, 100*(count(*)/(SELECT count(*) FROM business_risk)) "
-                       "FROM business_risk GROUP BY climate ORDER climate")
+        self.c.execute("SELECT climate, (count(*)/(SELECT count(*) FROM business_risk))*100 "
+                       "FROM business_risk GROUP BY climate ORDER BY climate")
         result = self.c.fetchall()
         agg_df = pd.DataFrame(result, columns=['climate', 'count'])
         climates = agg_df['climate'].tolist()
         contribution = agg_df['count'].tolist()
-
-        
+        explode = (0.1, 0, 0, 0, 0, 0, 0, 0)
+        fig1, ax1 = plt.subplots()
+        ax1.set_title('Business climate assesments')
+        ax1.pie(contribution, explode = explode, labels=climates, autopct='%1.1f%%', shadow=True, startangle=90)
+        ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+        plt.show()
 
 
 cs = ExportController()      # utworzenie obiektu i wywołanie konstruktora domyślnego
@@ -159,3 +163,4 @@ cs.printResults()
 cs.exportToXlsx()
 cs.exportToDatabase()
 cs.generatePlots()
+cs.generatePieChart()

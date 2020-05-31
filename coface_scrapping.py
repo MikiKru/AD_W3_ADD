@@ -27,11 +27,14 @@ class CofaceScrapping:
         self.countryRisks = []
         self.area = {0 : "Africa", 1 : "America", 2 : "Asia", 3 : "CIS", 4 : "Europe", 5 : "Middle-East"}
     def getTablesByPandas(self):
-        # pobieramy tabele z html do listy coface
         coface = pd.read_html(
-                'https://www.coface.com/Economic-Studies-and-Country-Risks/Comparative-table-of-country-assessments')
-        for c in coface:
-            print(c)
+            'https://www.coface.com/Economic-Studies-and-Country-Risks/Comparative-table-of-country-assessments')
+        for index, table in enumerate(coface):
+            columns = list(table)
+        self.countryRisks.append(CountryRisk(table[str(columns[0])].to_list(), "N/A", str(columns[0]),
+                                            table[str(columns[1])].to_list(), table[str(columns[2])].to_list()))
+        for element in self.countryRisks:
+            print(element)
     def getHtmlCodeByBs4(self):
         page = requests.get('https://www.coface.com/Economic-Studies-and-Country-Risks/Comparative-table-of-country-assessments')
         html = bs4.BeautifulSoup(page.content, 'html.parser')

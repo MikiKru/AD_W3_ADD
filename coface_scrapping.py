@@ -1,8 +1,11 @@
+import bs4
 import pandas as pd
 import lxml
 import html5lib
 # 1. Skrapowanie strony: https://www.coface.com/Economic-Studies-and-Country-Risks/Comparative-table-of-country-assessments
 # 2. Dwa podejścia bs4 i pd
+import requests
+
 
 class CountryRisk:
     def __init__(self, country, area, risk, climate):
@@ -24,13 +27,20 @@ class CofaceScrapping:
                 'https://www.coface.com/Economic-Studies-and-Country-Risks/Comparative-table-of-country-assessments')
         for c in coface:
             print(c)
-
     # def printResults(self):
     #     for i in self.countryRisks.index:
     #         print(self.countryRisks['Country risk assessment'][i])
-
     def getHtmlCodeByBs4(self):
-        pass
+        page = requests.get('https://www.coface.com/Economic-Studies-and-Country-Risks/Comparative-table-of-country-assessments')
+        html = bs4.BeautifulSoup(page.content, 'html.parser')
+
+        # headers = html.find_all('th', attrs={'class' : 'country'})
+        rows = html.find_all('tr')
+        # print(headers)
+        print(rows)
+        # print(len(headers))
+
 cs = CofaceScrapping()      # utworzenie obiektu i wywołanie konstruktora domyślnego
 cs.getTablesByPandas()      # wywołanie metody
+cs.getHtmlCodeByBs4()
 # cs.printResults()

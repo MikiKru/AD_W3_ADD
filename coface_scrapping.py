@@ -8,8 +8,9 @@ import requests
 
 
 class CountryRisk:
-    def __init__(self, country, area, risk, climate):
+    def __init__(self, country, ref, area, risk, climate):
         self.country = country
+        self.ref = ref
         self.area = area
         self.risk = risk
         self.climate = climate
@@ -34,13 +35,32 @@ class CofaceScrapping:
         page = requests.get('https://www.coface.com/Economic-Studies-and-Country-Risks/Comparative-table-of-country-assessments')
         html = bs4.BeautifulSoup(page.content, 'html.parser')
 
-        # headers = html.find_all('th', attrs={'class' : 'country'})
-        rows = html.find_all('tr')
-        # print(headers)
-        print(rows)
-        # print(len(headers))
+        tables = html.find_all('table', attrs={'class' : 'eval_tab'})   # lista 6 tabel
+        headers = []
+        data = []
+        refs = []
+        countries = []
+        for i,t in enumerate(tables):
+            headers.append(str(tables[i].findAll('th'))\
+                .replace('</th>','')\
+                .replace('[<th class="country">','')\
+                .replace('<th class="old_eval">\n','')\
+                .replace('<th class="new_eval">\n','')\
+                .replace(']','').split(', '))
+            tableMarkerA = tables[i].findAll('a')
+            for index, a in enumerate(tableMarkerA):
+                self.countryRisks.append(CountryRisk(
+                    str(a).replace('</a>', '').split('">')[1],
+                    str(a).replace('<a href="', '').split('">')[0],
+                    headers[i][0],
+                    "X",
+                    "X"))
+            # print(tables[i].findAll('span'))
+        for cs in self.countryRisks:
+            print(cs)
+
 
 cs = CofaceScrapping()      # utworzenie obiektu i wywołanie konstruktora domyślnego
-cs.getTablesByPandas()      # wywołanie metody
+# cs.getTablesByPandas()      # wywołanie metody
 cs.getHtmlCodeByBs4()
 # cs.printResults()

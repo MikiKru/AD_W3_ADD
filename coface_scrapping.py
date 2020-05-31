@@ -75,14 +75,22 @@ class ExportController(CofaceScrapping):
         worksheet = workbook.add_worksheet()                    # utworzenie arkusz
         row = 0
         column = 0
+        # 1. obramowanie tabeli
+        # 2. autodopasowanie szerokości komórek do tekstu
+        tableFormat = workbook.add_format({'border' : 1})
+        headerFormat = workbook.add_format({'bold' : True, 'bg_color' : 'yellow', 'border' : 1})
+        worksheet.set_column(0, 0, 40)
+        worksheet.set_column(1, 1, 100)
+        worksheet.set_column(2, 2, 20)
+        worksheet.set_column(3, 5, 40)
         while(column < len(tableTitle)):
-            worksheet.write(row, column, tableTitle[column])
+            worksheet.write(row, column, tableTitle[column], headerFormat)
             column += 1
         row = 1
         while(row - 1 < len(self.countryRisks)):        # pętla iterująca po wierszach
             column = 0
             while(column < len(tableTitle)):    # pętla iterująca po kolumnach
-                worksheet.write(row, column, str(self.countryRisks[row - 1]).split("; ")[column])
+                worksheet.write(row, column, str(self.countryRisks[row - 1]).split("; ")[column], tableFormat)
                 column += 1
             row += 1
         workbook.close()
